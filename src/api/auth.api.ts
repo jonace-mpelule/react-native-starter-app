@@ -1,7 +1,7 @@
 import { ApiError } from "@/types/axios.t";
 import { ApiWrapper } from "./wrapper.api"
 
-const apiClient = new ApiWrapper();
+const apiWrapper = new ApiWrapper();
 
 interface LoginResponse {
     accessToken: string,
@@ -9,9 +9,8 @@ interface LoginResponse {
 }
 export const AuthAPI = {
     login: async () => {
-        const wrapper = new ApiWrapper();
         const data = {};
-        const response = await wrapper.call<LoginResponse, ApiError>("/v1/auth/login", {data, method: "POST"});
+        const response = await apiWrapper.call<LoginResponse, ApiError>("/v1/auth/login", {data, method: "POST"});
         return response;
     }
 };

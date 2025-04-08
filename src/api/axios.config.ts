@@ -46,8 +46,7 @@ axiosConfig.interceptors.request.use(async function (config) : Promise<any> {
             'x-refresh-token': refreshToken
         }
     }).then(async(response: any) => {
-       
-
+    
         const accessToken = response.data['data']['accessToken'];
         const refreshToken = response.data['data']['refreshToken'];
 
@@ -69,12 +68,9 @@ axiosConfig.interceptors.request.use(async function (config) : Promise<any> {
         useUserStore.setState({
             ...{}
         });
-
         await SecureStore.deleteItemAsync(TOKEN_KEY);
         await SecureStore.deleteItemAsync(USERID_KEY);
         await SecureStore.deleteItemAsync(REFRESH_TOKEN);
-        console.log(error.request['_headers']);
-        console.log(error.response['data']);
     })
 
     return newConf;
