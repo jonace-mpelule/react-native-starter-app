@@ -12,7 +12,9 @@
         {
           "origin": "https://n"
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-font"
     ],
     "name": "react-native-starter-app",
     "slug": "react-native-starter-app"
