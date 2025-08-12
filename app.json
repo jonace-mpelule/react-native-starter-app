@@ -32,10 +32,10 @@
     "name": "react-native-starter-app",
     "slug": "react-native-starter-app",
     "android": {
-      "package": "jonace.kanemaonline.app"
+      "package": "jonace.new.app"
     },
     "ios": {
-      "bundleIdentifier": "jonace.kanemaonline.app"
+      "bundleIdentifier": "jonace.new.app"
     }
   }
 }
