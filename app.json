@@ -14,9 +14,28 @@
         }
       ],
       "expo-secure-store",
-      "expo-font"
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/Poppins-Black.ttf",
+            "./src/assets/fonts/Poppins-Bold.ttf",
+            "./src/assets/fonts/Poppins-ExtraBold.ttf",
+            "./src/assets/fonts/Poppins-SemiBold.ttf",
+            "./src/assets/fonts/Poppins-Medium.ttf",
+            "./src/assets/fonts/Poppins-Regular.ttf"
+          ]
+        }
+      ]
     ],
+    "newArchEnabled": true,
     "name": "react-native-starter-app",
-    "slug": "react-native-starter-app"
+    "slug": "react-native-starter-app",
+    "android": {
+      "package": "jonace.kanemaonline.app"
+    },
+    "ios": {
+      "bundleIdentifier": "jonace.kanemaonline.app"
+    }
   }
 }

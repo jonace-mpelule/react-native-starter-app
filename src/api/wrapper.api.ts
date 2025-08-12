@@ -1,4 +1,4 @@
-import axios, { Method } from "axios/index";
+import axios, { type Method } from "axios/";
 import { axiosConfig } from "./axios.config";
 import { ApiResponse, RequestOptions } from "@/types/axios.t";
 
