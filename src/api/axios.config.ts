@@ -1,80 +1,95 @@
-import axios from "axios"
-import dayjs from "dayjs";
-import { jwtDecode } from "jwt-decode";
-import { REFRESH_TOKEN, TOKEN_KEY, USERID_KEY } from "@/constants/values";
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useAuthStore } from "@/stores/auth.store";
-import { useUserStore } from "@/stores/user.store";
+import { jwtDecode } from 'jwt-decode';
+import { Endpoints } from '@/constants/endpoints';
+import Strings from '@/constants/strings';
+import { useAuthStore } from '@/stores/auth.store';
+import { useUserStore } from '@/stores/user.store';
+import type { RefreshTokenResponse } from '@/types/api/api.responses.t';
 
-export const baseURL = 'http://127.0.0.1:2102'
+export const baseURL = 'http://127.0.0.1:2102';
 export const axiosConfig = axios.create({
-    baseURL,
-    headers: {
-        "Content-Type": "application/json",
-    }
-})
+	baseURL,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+});
 
-// d@ts-ignore
-axiosConfig.interceptors.request.use(async function (config) : Promise<any> {
-    var accessToken = SecureStore.getItem(TOKEN_KEY, {
-        requireAuthentication: false
-    });
+// d@ts-expect-error
+axiosConfig.interceptors.request.use(
+	async (config): Promise<any> => {
+		var accessToken = await SecureStore.getItemAsync(Strings.TOKEN_KEY);
+		var refreshToken = await SecureStore.getItemAsync(Strings.REFRESH_TOKEN);
 
-    var refreshToken = SecureStore.getItem(REFRESH_TOKEN, {
-        requireAuthentication: false
-    });
+		if (!(config.headers as any).Authorization) {
+			(config.headers as any).Authorization = `Bearer ${accessToken}`;
+		}
 
-    if (!config.headers!['Authorization']) {
-        config.headers!["Authorization"] = `Bearer ${accessToken}`;
-    }
-    
-    if (!accessToken || !refreshToken) return config;
+		if (!accessToken || !refreshToken) return config;
 
-    const user = jwtDecode(accessToken);
-    
-    const isExpired = dayjs.unix(user.exp!).diff(dayjs()) < 1;
-    console.log(isExpired);
-    if (!isExpired) return config;
+		const user = jwtDecode(accessToken);
 
-    const refresh = jwtDecode(refreshToken);
-    const isExp = dayjs.unix(refresh.exp!).diff(dayjs()) < 1;
-    console.log(`refresh token expired?: ${isExp}`);
+		const isExpired = dayjs.unix(Number(user.exp)).diff(dayjs()) < 1;
+		console.log(isExpired);
+		if (!isExpired) return config;
 
-    var newConf = await axios.post(`${baseURL}/v1/auth/refresh-token`, {}, {
-        headers: {
-            'Content-Type': 'application/json', 
-            'x-refresh-token': refreshToken
-        }
-    }).then(async(response: any) => {
-    
-        const accessToken = response.data['data']['accessToken'];
-        const refreshToken = response.data['data']['refreshToken'];
+		const refresh = jwtDecode(refreshToken);
+		const isExp = dayjs.unix(Number(refresh.exp)).diff(dayjs()) < 1;
+		console.log(`refresh token expired?: ${isExp}`);
 
-        axiosConfig.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        config.headers!['Authorization'] = `Bearer ${accessToken}`;
-        
-        SecureStore.setItem(TOKEN_KEY, accessToken, {
-            requireAuthentication: false,
-        });
-        SecureStore.setItem(REFRESH_TOKEN, refreshToken, {
-            requireAuthentication: false,
-        });
+		var newConf = await axios
+			.post(
+				`${baseURL}${Endpoints.RefreshTokenRoute}`,
+				{
+					refreshToken,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						// 'x-refresh-token': refreshToken
+					},
+				},
+			)
+			.then(async (response: any) => {
+				const data = response.data as RefreshTokenResponse;
 
-        return config;
-    }).catch(async (error) => {
-        useAuthStore.setState({
-            ...{}
-        });
-        useUserStore.setState({
-            ...{}
-        });
-        await SecureStore.deleteItemAsync(TOKEN_KEY);
-        await SecureStore.deleteItemAsync(USERID_KEY);
-        await SecureStore.deleteItemAsync(REFRESH_TOKEN);
-    })
+				console.log('------ refresh token response');
+				console.log(data);
+				console.log('------');
 
-    return newConf;
-    
-}, async (error) => {
-    console.log(error)
-})
+				const accessToken = data.tokens.accessToken;
+				const refreshToken = data.tokens.refreshToken;
+
+				axiosConfig.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+				(config.headers as any).Authorization = `Bearer ${accessToken}`;
+
+				await SecureStore.setItemAsync(Strings.TOKEN_KEY, accessToken);
+				await SecureStore.setItemAsync(Strings.REFRESH_TOKEN, refreshToken);
+
+				return config;
+			})
+			.catch(async (error) => {
+				const router = useRouter();
+				console.log('------------');
+				console.log(JSON.stringify(error.data));
+				console.log('------------');
+				useAuthStore.setState({
+					...{},
+				});
+				useUserStore.setState({
+					...{},
+				});
+				await SecureStore.deleteItemAsync(Strings.TOKEN_KEY);
+				await SecureStore.deleteItemAsync(Strings.USERID_KEY);
+				await SecureStore.deleteItemAsync(Strings.REFRESH_TOKEN);
+				router.dismissAll();
+			});
+
+		return newConf;
+	},
+	async (error) => {
+		console.log(error);
+	},
+);

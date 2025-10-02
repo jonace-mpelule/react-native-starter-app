@@ -1,11 +1,12 @@
-import { type } from "arktype"
+import z from "zod"
 
-export const user = type({
-    id: "number",
-    username: "string",
-    email: "string",
-    dateCreated: "Date",
-    updatedAt: "Date"
+export const userSchema = z.object({
+    id: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    profilePhoto: z.string().optional(),
+    dateCreated: z.date().optional(),
+    dateUpdated: z.date().optional(),
 })
 
-export type User = typeof user.t
+export type User = z.infer<typeof userSchema>

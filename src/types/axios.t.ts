@@ -11,9 +11,7 @@ export interface ApiResponse<T = any, E = any> {
     headers?: any
 }
 
-export interface ApiError {
-    success: boolean,
-    message?: string,
-    status?: number,
-    headers?: number
+export interface ApiError<T = any> {
+    data: T, 
+    message: string
 }

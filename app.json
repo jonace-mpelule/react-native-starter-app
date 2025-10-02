@@ -18,12 +18,12 @@
         "expo-font",
         {
           "fonts": [
-            "./src/assets/fonts/Poppins-Black.ttf",
-            "./src/assets/fonts/Poppins-Bold.ttf",
-            "./src/assets/fonts/Poppins-ExtraBold.ttf",
-            "./src/assets/fonts/Poppins-SemiBold.ttf",
-            "./src/assets/fonts/Poppins-Medium.ttf",
-            "./src/assets/fonts/Poppins-Regular.ttf"
+            "./src/assets/fonts/Rubik-Black.ttf",
+            "./src/assets/fonts/Rubik-Bold.ttf",
+            "./src/assets/fonts/Rubik-ExtraBold.ttf",
+            "./src/assets/fonts/Rubik-SemiBold.ttf",
+            "./src/assets/fonts/Rubik-Medium.ttf",
+            "./src/assets/fonts/Rubik-Regular.ttf"
           ]
         }
       ]
@@ -32,7 +32,8 @@
     "name": "react-native-starter-app",
     "slug": "react-native-starter-app",
     "android": {
-      "package": "jonace.new.app"
+      "package": "jonace.new.app",
+       "edgeToEdgeEnabled": true
     },
     "ios": {
       "bundleIdentifier": "jonace.new.app"
